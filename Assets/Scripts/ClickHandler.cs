@@ -5,9 +5,28 @@ namespace MineSweeper
 {
     public class ClickHandler : MonoBehaviour
     {
+        private bool m_AllowClick = true;
+
+        private void Start()
+        {
+            GameManager.Instance.GameOverEvent += OnGameOver;
+            GameManager.Instance.GameResetEvent += OnGameReset;
+        }
+
+        private void OnDestroy()
+        {
+            GameManager gameManager = GameManager.Instance;
+
+            if (gameManager != null)
+            {
+                gameManager.GameOverEvent -= OnGameOver;
+                gameManager.GameResetEvent -= OnGameReset;
+            }
+        }
+
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && m_AllowClick)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -22,6 +41,16 @@ namespace MineSweeper
                     }
                 }
             }
+        }
+
+        private void OnGameOver()
+        {
+            m_AllowClick = false;
+        }
+
+        private void OnGameReset()
+        {
+            m_AllowClick = true;
         }
     }
 }

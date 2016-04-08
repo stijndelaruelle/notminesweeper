@@ -19,18 +19,28 @@ namespace MineSweeper
             GenerateGrid(width, height);
         }
 
-        public void GenerateGrid(int width, int height)
+        private void GenerateGrid(int width, int height)
         {
             m_Tiles.Clear();
+            AddChunck(width, height);
+        }
 
-            for (int i = 0; i < (int)(width * height); ++i)
+        public void AddChunck(int width, int height)
+        {
+            int startID = m_Tiles.Count - 1;
+            int endID = startID + (int)(width * height);
+
+            for (int i = startID; i < endID; ++i)
             {
-                Tile newTile = new Tile();
+                int row = (i / width) + 1;
+                Tile newTile = new Tile(row);
+
                 m_Tiles.Add(newTile);
-                //Add neighbours of the row above
+
+                //Add neighbours of the row below
                 if (i >= width)
                 {
-                    //Top Left
+                    //Bottom Left
                     if ((i % width) > 0)
                     {
                         Tile topLeftTile = m_Tiles[i - width - 1];
@@ -38,12 +48,12 @@ namespace MineSweeper
                         topLeftTile.AddNeighbour(newTile);
                     }
 
-                    //Top Middle
+                    //Bottom Middle
                     Tile topMiddleTile = m_Tiles[i - width];
                     newTile.AddNeighbour(topMiddleTile);
                     topMiddleTile.AddNeighbour(newTile);
 
-                    //Top Right
+                    //Bottom Right
                     if ((i % width) < (width - 1))
                     {
                         Tile topLeftTile = m_Tiles[i - width + 1];
@@ -62,7 +72,7 @@ namespace MineSweeper
             }
         }
 
-        public void FillGrid(int numberOfBombs)
+        public void FillChunk(int numberOfBombs)
         {
             //Clear values
             foreach (Tile tile in m_Tiles)

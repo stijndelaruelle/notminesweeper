@@ -12,23 +12,37 @@ namespace MineSweeper
             get { return m_Value; }
         }
 
+        private int m_Row = 0;
+        public int Row
+        {
+            get { return m_Row; }
+        }
+
         private bool m_IsDiscovered = false;
         public bool IsDiscovered
         {
             get { return m_IsDiscovered; }
+            set { m_IsDiscovered = value; }
         }
 
-        private bool m_HasFlag = false;
-        public bool HasFlag
-        {
-            get { return m_HasFlag; }
-        }
+        //private bool m_HasFlag = false;
+        //public bool HasFlag
+        //{
+        //    get { return m_HasFlag; }
+        //}
 
         private List<Tile> m_Neighbours;
+        private VisualTile m_VisualTile;
+        public VisualTile VisualTile
+        {
+            get { return m_VisualTile; }
+            set { m_VisualTile = value; }
+        }
 
-        public Tile()
+        public Tile(int row)
         {
             m_Neighbours = new List<Tile>();
+            m_Row = row;
         }
 
         public void AddNeighbour(Tile neighbour)
@@ -66,7 +80,22 @@ namespace MineSweeper
         {
             m_Value = 0;
             m_IsDiscovered = false;
-            m_HasFlag = false;
+            //m_HasFlag = false;
+        }
+
+        public List<VisualTile> GetVisualNeighbours()
+        {
+            List<VisualTile> visualNeighbours = new List<VisualTile>();
+
+            foreach (Tile neighbour in m_Neighbours)
+            {
+                VisualTile visualTile = neighbour.VisualTile;
+
+                if (visualTile != null)
+                    visualNeighbours.Add(visualTile);
+            }
+
+            return visualNeighbours;
         }
     }
 }

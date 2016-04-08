@@ -6,7 +6,13 @@ namespace MineSweeper
     public class VisualTileGrid : MonoBehaviour
     {
         [SerializeField]
-        private Vector2 m_Size;
+        private Vector2 m_ChunkSize;
+
+        [SerializeField]
+        private int m_BombsInChunk;
+
+        [SerializeField]
+        private int m_BombIncreaseRate;
 
         [SerializeField]
         private Pool m_VisualTilePool;
@@ -14,31 +20,58 @@ namespace MineSweeper
 
         private void Start()
         {
-            m_TileGridData = new TileGrid((int)m_Size.x, (int)m_Size.y);
+            m_TileGridData = new TileGrid((int)m_ChunkSize.x, (int)m_ChunkSize.y);
+
+            GameManager.Instance.GameResetEvent += OnGameReset;
+            GameManager.Instance.TileDiscoveredEvent += OnTileDiscovered;
         }
 
-        private void FillGrid()
+        private void OnDestroy()
+        {
+            GameManager gameManager = GameManager.Instance;
+
+            if (gameManager != null)
+            {
+                gameManager.GameResetEvent -= OnGameReset;
+                gameManager.TileDiscoveredEvent -= OnTileDiscovered;
+            }  
+        }
+
+        private void ClearGrid()
         {
             m_VisualTilePool.ResetAll();
-            m_TileGridData.FillGrid(5);
+        }
 
-            int totalSize = (int)(m_Size.x * m_Size.y);
+        private void AddChunk()
+        {
+            
+            m_TileGridData.FillChunk(m_BombsInChunk);
+
+            int totalSize = (int)(m_ChunkSize.x * m_ChunkSize.y);
 
             for (int i = 0; i < totalSize; ++i)
             {
-                Vector3 pos = new Vector3((int)(i % m_Size.x), 0.0f, (int)(i / m_Size.x));
+                Vector3 pos = new Vector3((int)(i % m_ChunkSize.x), 0.0f, (int)(i / m_ChunkSize.x));
                 VisualTile visualTile = m_VisualTilePool.ActivateAvailableObject(pos, Quaternion.identity) as VisualTile;
+                Tile tile = m_TileGridData.GetTile(i);
 
-                visualTile.SetTileData(m_TileGridData.GetTile(i));
+                visualTile.SetTileData(tile);
+                tile.VisualTile = visualTile;
+
+                //Enable the first row of tiles
+                if (i < m_ChunkSize.x)
+                    visualTile.Enable();
             }
         }
 
-        private void Update()
+        private void OnGameReset()
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                FillGrid();
-            }
+            ClearGrid();
+        }
+
+        private void OnTileDiscovered(Tile tile)
+        {
+
         }
     }
 }

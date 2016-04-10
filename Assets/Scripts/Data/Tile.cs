@@ -25,6 +25,13 @@ namespace MineSweeper
             set { m_IsDiscovered = value; }
         }
 
+        private bool m_IsEnabled = false;
+        public bool IsEnabled
+        {
+            get { return m_IsEnabled; }
+            set { m_IsEnabled = value; }
+        }
+
         //private bool m_HasFlag = false;
         //public bool HasFlag
         //{
@@ -80,6 +87,7 @@ namespace MineSweeper
         {
             m_Value = 0;
             m_IsDiscovered = false;
+            m_IsEnabled = false;
             //m_HasFlag = false;
         }
 

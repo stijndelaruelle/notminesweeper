@@ -25,11 +25,6 @@ namespace MineSweeper
                 m_Cover.TriggerEvent -= OnCoverRemoved;
         }
 
-        private void Update()
-        {
-            //DisableIfOffScreen();
-        }
-
         public void SetTileData(Tile tileData)
         {
             m_TileData = tileData;
@@ -61,12 +56,16 @@ namespace MineSweeper
                 m_Cover.Reset();
             }
 
+            if (m_TileData.IsEnabled)
+                Enable();
+
             //Place the flag if required
 
         }
 
         public void Enable()
         {
+            m_TileData.IsEnabled = true;
             m_Cover.SetEnabled(true);
         }
 
@@ -116,13 +115,6 @@ namespace MineSweeper
             yield return null;
         }
 
-        private void DisableIfOffScreen()
-        {
-            Vector3 viewPos = Camera.main.WorldToViewportPoint(transform.position);
-            if (viewPos.x < 0.0f || viewPos.x > 1.0f || viewPos.y < 0.0f || viewPos.y > 1.0f)
-                Deactivate();
-        }
-
         #region PoolableObject
 
         public override void Initialize()
@@ -132,8 +124,8 @@ namespace MineSweeper
 
         public override void Activate(Vector3 pos, Quaternion rot)
         {
-            gameObject.transform.position = pos;
-            gameObject.transform.rotation = rot;
+            gameObject.transform.localPosition = pos;
+            gameObject.transform.localRotation = rot;
 
             gameObject.SetActive(true);
         }

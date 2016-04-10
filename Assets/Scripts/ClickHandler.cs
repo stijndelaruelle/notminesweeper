@@ -5,6 +5,11 @@ namespace MineSweeper
 {
     public class ClickHandler : MonoBehaviour
     {
+        [SerializeField]
+        private float m_DragMargin = 0.1f;
+        private float m_StartDragPosition;
+        private bool m_IsDragging = false;
+
         private bool m_AllowClick = true;
 
         private void Start()
@@ -28,16 +33,36 @@ namespace MineSweeper
         {
             if (Input.GetMouseButtonDown(0) && m_AllowClick)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                m_StartDragPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition).y;
+                m_IsDragging = false;
+            }
 
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
+            if (Input.GetMouseButton(0) && m_IsDragging == false)
+            {
+                float currentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition).y;
+
+                if (Mathf.Abs(currentPos - m_StartDragPosition) >= m_DragMargin)
                 {
-                    IClickable clickableObject = hit.transform.gameObject.GetComponent<IClickable>();
+                    m_IsDragging = true;
+                }
+            }
 
-                    if (clickableObject != null)
+            if (Input.GetMouseButtonUp(0) && m_AllowClick)
+            {
+                //Check if we were dragging, if so don't click!
+                if (!m_IsDragging)
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit))
                     {
-                        clickableObject.OnClick();
+                        IClickable clickableObject = hit.transform.gameObject.GetComponent<IClickable>();
+
+                        if (clickableObject != null)
+                        {
+                            clickableObject.OnClick();
+                        }
                     }
                 }
             }
